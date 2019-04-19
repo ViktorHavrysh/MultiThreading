@@ -3,55 +3,32 @@ using System.Threading.Tasks;
 
 namespace DataRace
 {
-    // Invariant: A must be equal to B
-    internal struct Test
+    // Invariant: A must be always equal to B
+    public struct Foo
     {
-        private long _a;
-        private long _b;
+        public long A { get; private set; }
+        public long B { get; private set; }
 
-        public long A
+        public Foo Increment()
         {
-            get => _a;
-            set
-            {
-                _a = value;
-                _b = value;
-            }
+            return new Foo {A = A + 1, B = B + 1};
         }
 
-        public long B
+        public override string ToString()
         {
-            get => _b;
-            set
-            {
-                _a = value;
-                _b = value;
-            }
+            var invariant = A == B ? "upheld" : $"broken by {Math.Abs(A - B)}";
+            return $"A = {A}, B = {B}, Invariant: {invariant}";
         }
     }
 
+
     public static class Program
     {
-        private static Test _testStatic;
-        private static readonly Random _random = new Random();
-
-        public static void Main(string[] _)
+        public static void Main()
         {
-            var test1 = new Test {A = 1};
-            var test2 = new Test {A = 2};
-
-            for (int i = 0; i < 1_000_000; i++)
-            {
-                Task.Run(() =>
-                {
-                    _testStatic = i % 2 == 0 ? test1 : test2;
-                    var copy = _testStatic;
-                    if (copy.A != copy.B)
-                    {
-                        Console.WriteLine("Invariant broken!");
-                    }
-                });
-            }
+            var foo = new Foo();
+            Parallel.For(0, 1_000_000, i => { foo = foo.Increment(); });
+            Console.WriteLine(foo);
         }
     }
 }
