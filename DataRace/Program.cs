@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace DataRace
 {
@@ -9,25 +8,25 @@ namespace DataRace
         public long A { get; private set; }
         public long B { get; private set; }
 
-        public Foo Increment()
+        public Foo IncrementBy(long v)
         {
-            return new Foo {A = A + 1, B = B + 1};
+            A = A + v;
+            B = B + v;
+            return this;
         }
 
         public override string ToString()
         {
-            var invariant = A == B ? "upheld" : $"broken by {Math.Abs(A - B)}";
-            return $"A = {A}, B = {B}, Invariant: {invariant}";
+            return $"A = {A}, B = {B}";
         }
     }
-
 
     public static class Program
     {
         public static void Main()
         {
             var foo = new Foo();
-            Parallel.For(0, 1_000_000, i => { foo = foo.Increment(); });
+            foo = Fooinator.SetFoo(foo, 1000,100);
             Console.WriteLine(foo);
         }
     }
