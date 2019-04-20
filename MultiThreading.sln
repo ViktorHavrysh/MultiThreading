@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataRace", "DataRace\DataRace.csproj", "{F5B16489-741E-4171-A380-A72D921D326A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoryModel", "MemoryModel\MemoryModel.csproj", "{954CFDE4-C9E4-42F7-AE02-FBC59162F3F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synchronization", "Synchronization\Synchronization.csproj", "{C271151B-1509-4FFA-BBAA-EE3FBA19F68B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{F5B16489-741E-4171-A380-A72D921D326A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5B16489-741E-4171-A380-A72D921D326A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5B16489-741E-4171-A380-A72D921D326A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{954CFDE4-C9E4-42F7-AE02-FBC59162F3F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{954CFDE4-C9E4-42F7-AE02-FBC59162F3F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{954CFDE4-C9E4-42F7-AE02-FBC59162F3F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{954CFDE4-C9E4-42F7-AE02-FBC59162F3F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C271151B-1509-4FFA-BBAA-EE3FBA19F68B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C271151B-1509-4FFA-BBAA-EE3FBA19F68B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C271151B-1509-4FFA-BBAA-EE3FBA19F68B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C271151B-1509-4FFA-BBAA-EE3FBA19F68B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

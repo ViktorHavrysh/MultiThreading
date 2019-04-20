@@ -5,9 +5,11 @@ namespace DataRace
     // Invariant: A must be always equal to B
     public struct Foo
     {
+        // Private setters; encapsulation!
         public long A { get; private set; }
         public long B { get; private set; }
 
+        // The only method that can modify this type
         public Foo IncrementBy(long v)
         {
             A = A + v;
@@ -15,6 +17,7 @@ namespace DataRace
             return this;
         }
 
+        // Just for displaying Foo
         public override string ToString()
         {
             return $"A = {A}, B = {B}";
@@ -26,7 +29,8 @@ namespace DataRace
         public static void Main()
         {
             var foo = new Foo();
-            foo = Fooinator.SetFoo(foo, 1000,100);
+            // Magic!
+            foo = Fooinator.SetFoo(foo, 100, 1000);
             Console.WriteLine(foo);
         }
     }
