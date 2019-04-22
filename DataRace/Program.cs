@@ -12,9 +12,8 @@ namespace DataRace
         // The only method that can modify this type
         public Foo IncrementBy(long v)
         {
-            A = A + v;
-            B = B + v;
-            return this;
+            var newFoo = new Foo {A = A + v, B = B + v};
+            return newFoo;
         }
 
         // Just for displaying Foo
@@ -30,7 +29,7 @@ namespace DataRace
         {
             var foo = new Foo();
             // Magic!
-            foo = Fooinator.SetFoo(foo, 100, 1000);
+            foo = Fooinator.SetFoo(foo, 13, 80000);
             Console.WriteLine(foo);
         }
     }

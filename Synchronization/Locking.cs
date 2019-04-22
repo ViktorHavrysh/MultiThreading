@@ -7,6 +7,7 @@ namespace Synchronization
     // that the thread will see all updates made by the thread that held the lock earlier.
     public class Locking
     {
+        // These two fields need to be guarded by the _lock object
         private int _a;
         private int _b;
         private readonly object _lock = new object();

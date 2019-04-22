@@ -1,33 +1,23 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace MemoryModel
 {
-    // Polling loop is a pattern that's generally not recommended but--somewhat unfortunately--frequently used in
-    // practice
-
-    // In this example, the main thread loops, polling a particular non-volatile field. A helper thread sets the field
-    // in the meantime, but the main thread may never see the updated value.
-    public class PollingLoopExample
-    {
-        public bool Loop = true;
-    }
-
     public static class Program
     {
         public static void Main()
         {
             var sw = Stopwatch.StartNew();
-            var test1 = new PollingLoopExample();
-            // Set _loop to false on another thread
+            var loop = true;
+
+            // Set Loop to false on another thread
             Task.Run(
                 () =>
                 {
                     Thread.Sleep(2000);
-                    test1.Loop = false;
+                    loop = false;
                 });
 
             long counter = 0;
@@ -38,29 +28,36 @@ namespace MemoryModel
                 {
                     while (true)
                     {
-                        Console.WriteLine($"State: Loop = {test1.Loop}, Loops: {counter}, Elapsed: {sw.Elapsed.TotalMilliseconds} ms");
+                        Console.WriteLine($"State: Continue = {loop}, Loops: {counter}, Elapsed: {sw.Elapsed.TotalMilliseconds} ms");
                         Thread.Sleep(500);
                     }
                 });
 
             // Poll the _loop field until it is set to false
-            while (test1.Loop)
+            var loopCopy = loop;
+            while (loopCopy)
             {
+                // Do some work
                 counter++;
             }
 
-            // The previous loop may never terminate
             Console.WriteLine("We finished! {0} loops", counter);
         }
     }
 
+    // Polling loop is a pattern that's generally not recommended but--somewhat unfortunately--frequently used in
+    // practice
+
+    // In the previous example, the main thread loops, polling a particular non-volatile field. A helper thread sets the field
+    // in the meantime, but the main thread may never see the updated value.
+
     // One source of complexity in multithreaded programming is that the compiler and the hardware can subtly transform
-    // a program’s memory operations in ways that don’t affect the single-threaded behavior, but might affect the
+    // a program's memory operations in ways that don't affect the single-threaded behavior, but might affect the
     // multithreaded behavior. Consider the following:
     public class DataInit
     {
-        private int _data;
         private bool _initialized;
+        private int _data;
 
         public void Init()
         {
@@ -88,7 +85,7 @@ namespace MemoryModel
         // single-threaded execution doesn't change. For example, the compiler and the processor are free to reorder
         // the Init method operations.
 
-        public void Init2()
+        public void InitReordering()
         {
             _initialized = true; // Write 2
             _data = 42; // Write 1
@@ -102,12 +99,12 @@ namespace MemoryModel
         // The reordering of Init isn't the only possible source of trouble in this code sample. Even if the Init writes
         // don't end up reordered, the reads in the Print method could be transformed:
 
-        public string Print2()
+        public string PrintReordering()
         {
             var d = _data; // Read 2
-            if (_initialized)
+            if (_initialized) // Read 1
             {
-                return d.ToString(); // Read 2
+                return d.ToString();
             }
             else
             {
@@ -160,7 +157,7 @@ namespace MemoryModel
     // A write of a volatile field, on the other hand, has release semantics, and so it can't be reordered with prior
     // operations. A volatile write forms a one-way fence, as this example demonstrates:
 
-    class ReleaseSemanticsExample
+    public class ReleaseSemanticsExample
     {
         private int _a;
         private volatile int _b;
