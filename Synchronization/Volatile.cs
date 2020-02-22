@@ -2,7 +2,7 @@ using System;
 
 namespace Synchronization
 {
-    // If no memory operations are reordered, Print can only print “Not initialized” or “42,” but there are two possible
+    // If no memory operations are reordered, Print can only print "Not initialized" or "42", but there are two possible
     // cases when Print could print a "0":
     // * Write 1 and Write 2 were reordered.
     // * Read 1 and Read 2 were reordered.

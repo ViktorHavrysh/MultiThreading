@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Synchronization
 {
-    // Interlocked operations are atomic operations that can be used at times to reduce locking in a multithreaded
-    // program. Consider this simple thread-safe counter class:
+    // Interlocked operations are atomic operations that can be used to reduce locking in a multithreaded program.
+    // Consider this simple thread-safe counter class:
     public class CounterLock
     {
         private int _value = 0;

@@ -7,17 +7,18 @@ namespace MemoryModel
 {
     public static class Program
     {
+        private static volatile bool _loop = true;
+
         public static void Main()
         {
             var sw = Stopwatch.StartNew();
-            var loop = true;
 
             // Set Loop to false on another thread
             Task.Run(
                 () =>
                 {
-                    Thread.Sleep(2000);
-                    loop = false;
+                    Thread.Sleep(5000);
+                    _loop = false; // Write A
                 });
 
             long counter = 0;
@@ -28,14 +29,13 @@ namespace MemoryModel
                 {
                     while (true)
                     {
-                        Console.WriteLine($"State: Continue = {loop}, Loops: {counter}, Elapsed: {sw.Elapsed.TotalMilliseconds} ms");
+                        Console.WriteLine($"State: Continue = {_loop}, Loops: {counter}, Elapsed: {sw.Elapsed.TotalMilliseconds} ms");
                         Thread.Sleep(500);
                     }
                 });
 
             // Poll the _loop field until it is set to false
-            var loopCopy = loop;
-            while (loopCopy)
+            while (_loop) // Read A
             {
                 // Do some work
                 counter++;
@@ -48,8 +48,8 @@ namespace MemoryModel
     // Polling loop is a pattern that's generally not recommended but--somewhat unfortunately--frequently used in
     // practice
 
-    // In the previous example, the main thread loops, polling a particular non-volatile field. A helper thread sets the field
-    // in the meantime, but the main thread may never see the updated value.
+    // In the previous example, the main thread loops, polling a particular non-volatile field. A helper thread sets the
+    // field in the meantime, but the main thread may never see the updated value.
 
     // One source of complexity in multithreaded programming is that the compiler and the hardware can subtly transform
     // a program's memory operations in ways that don't affect the single-threaded behavior, but might affect the
@@ -61,15 +61,15 @@ namespace MemoryModel
 
         public void Init()
         {
-            _data = 42; // Write 1
-            _initialized = true; // Write 2
+            _data = 42; // Write A
+            _initialized = true; // Write B
         }
 
         public string Print()
         {
-            if (_initialized) // Read 1
+            if (_initialized) // Read A
             {
-                return _data.ToString(); // Read 2
+                return _data.ToString(); // Read B
             }
             else
             {
@@ -87,22 +87,22 @@ namespace MemoryModel
 
         public void InitReordering()
         {
-            _initialized = true; // Write 2
-            _data = 42; // Write 1
+            _initialized = true; // Write B
+            _data = 42; // Write A
         }
 
         // This reordering wouldn't change the behavior of the Init method in a single-threaded program. In a
         // multithreaded program, however, another thread might read _initialized and _data fields after Init has
         // modified one field but not the other, and then the reordering could change the behavior of the program. As a
-        // result, the Print method could end up outputting a “0.”
+        // result, the Print method could end up outputting a 0.
 
         // The reordering of Init isn't the only possible source of trouble in this code sample. Even if the Init writes
         // don't end up reordered, the reads in the Print method could be transformed:
 
         public string PrintReordering()
         {
-            var d = _data; // Read 2
-            if (_initialized) // Read 1
+            var d = _data; // Read B
+            if (_initialized) // Read A
             {
                 return d.ToString();
             }

@@ -1,8 +1,8 @@
+using System;
+using System.Threading;
+
 namespace Synchronization
 {
-    using System;
-    using System.Threading;
-
     class LazyExample
     {
         // The lazy initializer is created here. LargeObject is not created until the ThreadProc method executes.
