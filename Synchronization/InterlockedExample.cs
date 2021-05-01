@@ -12,12 +12,11 @@ namespace Synchronization
         private int _value = 0;
         private readonly object _lock = new object();
 
-        public int Increment()
+        public void Increment()
         {
             lock (_lock)
             {
                 _value++;
-                return _value;
             }
         }
     }
@@ -27,9 +26,9 @@ namespace Synchronization
     {
         private int _value = 0;
 
-        public int Increment()
+        public void Increment()
         {
-            return Interlocked.Increment(ref _value);
+            Interlocked.Increment(ref _value);
         }
     }
 
@@ -44,7 +43,7 @@ namespace Synchronization
 
         private const int NumThreadIterations = 5;
         private const int NumThreads = 10;
-        private static readonly AsyncLocal<int> TaskNumber = new AsyncLocal<int>();
+        private static readonly AsyncLocal<int> TaskNumber = new();
 
         public static void Try()
         {

@@ -28,9 +28,8 @@ namespace DataRace
     {
         public static void Main()
         {
-            var foo = new Foo();
             // Magic!
-            foo = Fooinator.SetFoo(foo, 7, 2);
+            Foo foo = Fooinator.SetFoo(5, 9);
             Console.WriteLine(foo);
         }
     }

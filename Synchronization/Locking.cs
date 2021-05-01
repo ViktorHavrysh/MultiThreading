@@ -2,8 +2,8 @@ using System;
 
 namespace Synchronization
 {
-    // Locking is typically the easiest way to share data among threads. If you use locks correctly, you basically
-    // don’t have to worry about any of the memory model messiness. Whenever a thread acquires a lock, the CLR ensures
+    // Locking is typically the easiest way to share data between threads. If you use locks correctly, you basically
+    // don't have to worry about any of the memory model messiness. Whenever a thread acquires a lock, the CLR ensures
     // that the thread will see all updates made by the thread that held the lock earlier.
     public class Locking
     {
@@ -31,7 +31,7 @@ namespace Synchronization
             }
         }
     }
-    // Adding a lock that Print and Set acquire provides a simple solution. Now, Set and Print execute atomically with
+    // Adding a lock that Print and Set acquire provides a simple solution. Now, Set and Print execute exclusively with
     // respect to each other. The lock statement guarantees that the bodies of Print and Set will appear to execute in
-    // some sequential order, even if they’re called from multiple threads.
+    // a sequential order, even if they’re called from multiple threads.
 }

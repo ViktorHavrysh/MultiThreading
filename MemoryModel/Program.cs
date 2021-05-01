@@ -7,10 +7,9 @@ namespace MemoryModel
 {
     public static class Program
     {
-        private static volatile bool _loop = true;
-
         public static void Main()
         {
+            bool loop = true;
             var sw = Stopwatch.StartNew();
 
             // Set Loop to false on another thread
@@ -18,7 +17,7 @@ namespace MemoryModel
                 () =>
                 {
                     Thread.Sleep(5000);
-                    _loop = false; // Write A
+                    loop = false; // Write A
                 });
 
             long counter = 0;
@@ -29,13 +28,13 @@ namespace MemoryModel
                 {
                     while (true)
                     {
-                        Console.WriteLine($"State: Continue = {_loop}, Loops: {counter}, Elapsed: {sw.Elapsed.TotalMilliseconds} ms");
                         Thread.Sleep(500);
+                        Console.WriteLine($"State: Continue = {loop}, Loops: {counter}, Elapsed: {sw.Elapsed.TotalMilliseconds} ms");
                     }
                 });
 
             // Poll the _loop field until it is set to false
-            while (_loop) // Read A
+            while (loop) // Read A
             {
                 // Do some work
                 counter++;
@@ -48,42 +47,40 @@ namespace MemoryModel
     // Polling loop is a pattern that's generally not recommended but--somewhat unfortunately--frequently used in
     // practice
 
-    // In the previous example, the main thread loops, polling a particular non-volatile field. A helper thread sets the
+    // In the previous example, the main thread loops, polling a particular variable. A helper thread sets the
     // field in the meantime, but the main thread may never see the updated value.
 
     // One source of complexity in multithreaded programming is that the compiler and the hardware can subtly transform
     // a program's memory operations in ways that don't affect the single-threaded behavior, but might affect the
     // multithreaded behavior. Consider the following:
-    public class DataInit
+    public class DataInitExample // this and the following are not real-life code, consider this prose with some code
     {
         private bool _initialized;
         private int _data;
 
-        public void Init()
+        public void Init() // Thread 1
         {
             _data = 42; // Write A
             _initialized = true; // Write B
         }
 
-        public string Print()
+        public string Print() // Thread 2
         {
             if (_initialized) // Read A
             {
                 return _data.ToString(); // Read B
             }
-            else
-            {
-                return "Not initialized";
-            }
+
+            return "Not initialized";
         }
 
-        // Suppose Init and Print are called in parallel (that is, on different threads) on a new instance of DataInit.
+        // Suppose Init and Print are called in parallel (that is, on different threads) on the same instance of DataInit.
         // If you examine the code of Init and Print, it may seem that Print can only output "42" or "Not initialized".
         // However, Print can also output "0".
 
         // The C# memory model permits reordering of memory operations in a method, as long as the behavior of
-        // single-threaded execution doesn't change. For example, the compiler and the processor are free to reorder
-        // the Init method operations.
+        // single-threaded execution doesn't change. For example, the compiler and the CPU are free to reorder
+        // the Init method operations like this:
 
         public void InitReordering()
         {
@@ -106,10 +103,8 @@ namespace MemoryModel
             {
                 return d.ToString();
             }
-            else
-            {
-                return "Not initialized";
-            }
+
+            return "Not initialized";
         }
 
         // Just as with the reordering of writes, this transformation has no effect in a single-threaded program, but
@@ -118,7 +113,7 @@ namespace MemoryModel
     }
 
     // The C# programming language provides volatile fields that constrain how memory operations can be reordered.
-    // The ECMA specification states that volatile fields provide acquire­release semantics.
+    // The ECMA specification states that volatile fields provide acquire-release semantics.
 
     // A read of a volatile field has acquire semantics, which means it can't be reordered with subsequent operations.
     // The volatile read forms a one-way fence: preceding operations can pass it, but subsequent operations can't.
@@ -163,7 +158,7 @@ namespace MemoryModel
         private volatile int _b;
         private int _c;
 
-        private void Foo()
+        public void Foo()
         {
             _a = 1; // Write 1
             _b = 1; // Write 2 (volatile)

@@ -20,13 +20,13 @@ namespace Synchronization
             t.Wait();
         }
 
-        // The Task.Run() implementation must ensure that the write to _value on Thread 1 will not move after
+        // The Task.Run() implementation ensures that the write to _value on Thread 1 will not move after
         // <start task t>, and the read from s_value on Thread 2 will not move before <task t starting>. And, in fact,
         // the Task.Run() and Task.Factory.StartNew() APIs really do guarantee this.
         //
         // All other threading APIs in the .NET Framework, such as Thread.Start() and ThreadPool.QueueUserWorkItem(),
         // also make a similar guarantee. In fact, nearly every threading API must have some barrier semantics in order
-        // to function correctly. These are almost never documented, but can usually be deduced simply by thinking about
-        // what the guarantees would have to be in order for the API to be useful.
+        // to function correctly. These are, unfortunately, almost never documented, but at least they function in a way
+        // that seems obvious, so most code does not require always thinking about the memory model of C#.
     }
 }
